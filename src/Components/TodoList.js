@@ -1,65 +1,64 @@
 import React, { useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  addTodo,
-  markAllCompleted,
-  clearCompleted,
-} from "../slices/todosSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, toggleComplete, changeColor, deleteTodo } from "../slices/todosSlice";
 import TodoItem from "./TodoItem";
 
 const TodoList = () => {
-  const inputRef = useRef(null);
-  const todos = useSelector((state) => state.todos.todos);
   const dispatch = useDispatch();
+  const todos = useSelector((state) => state.todos.todos);
+  const filterStatus = useSelector((state) => state.todos.filterStatus);
+  const filterColors = useSelector((state) => state.todos.filterColors);
+
+  const inputRef = useRef(null);
 
   const handleAddTask = () => {
-    const newTask = inputRef.current.value.trim();
-    if (newTask) {
-      dispatch(addTodo(newTask));
+    const taskText = inputRef.current.value.trim();
+    if (taskText) {
+      dispatch(addTodo(taskText));
       inputRef.current.value = "";
     }
   };
 
-  return (
-    <div className="p-6 bg-gray-100 shadow-lg rounded-lg max-w-md mx-auto mt-10">
-     
+  const filteredTodos = todos.filter((todo) => {
+    if (filterStatus === "Active" && todo.completed) return false;
+    if (filterStatus === "Completed" && !todo.completed) return false;
+    if (filterColors.length > 0 && !filterColors.includes(todo.color)) return false;
+    return true;
+  });
 
-      <div className="flex gap-2 mb-4">
+
+
+  return (
+    <>
+    <div>
+      <div className="flex mb-5 gap-3 ">
         <input
+          ref={inputRef}
           type="text"
           placeholder="Add a new task..."
-          ref={inputRef}
-          className="flex-1 p-2 border rounded"
+          className="flex-grow px-40 py-2 border rounded-md"
         />
         <button
           onClick={handleAddTask}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
         >
-          Add
+          Add Task
         </button>
       </div>
-
+      
       <ul>
-        {todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} />
+        {filteredTodos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            toggleComplete={() => dispatch(toggleComplete(todo.id))}
+            changeColor={(color) => dispatch(changeColor({ id: todo.id, color }))}
+            deleteTodo={() => dispatch(deleteTodo(todo.id))}
+          />
         ))}
       </ul>
-
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={() => dispatch(markAllCompleted())}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-        >
-          Mark All Completed
-        </button>
-        <button
-          onClick={() => dispatch(clearCompleted())}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          Clear Completed
-        </button>
-      </div>
     </div>
+  </>
   );
 };
 

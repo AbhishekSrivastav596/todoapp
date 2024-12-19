@@ -1,50 +1,65 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  todos: []
-  
+  todos: [],
+  filterStatus: "All", 
+  filterColors: [], 
 };
 
-export const todosSlice = createSlice({
-  name: 'todos',
+const todosSlice = createSlice({
+  name: "todos",
   initialState,
   reducers: {
     addTodo: (state, action) => {
-      state.todos.push({
+      const newTodo = {
         id: Date.now(),
         text: action.payload,
         completed: false,
-        color: '',
-      });
+        color: "",
+      };
+      state.todos.push(newTodo);
     },
-    toggleTodo: (state, action) => {
+    toggleComplete: (state, action) => {
       const todo = state.todos.find((t) => t.id === action.payload);
       if (todo) todo.completed = !todo.completed;
-    },
-    removeTodo: (state, action) => {
-      state.todos = state.todos.filter((t) => t.id !== action.payload);
     },
     changeColor: (state, action) => {
       const { id, color } = action.payload;
       const todo = state.todos.find((t) => t.id === id);
       if (todo) todo.color = color;
     },
+    deleteTodo: (state, action) => {
+      state.todos = state.todos.filter((t) => t.id !== action.payload);
+    },
     markAllCompleted: (state) => {
       state.todos.forEach((todo) => (todo.completed = true));
     },
     clearCompleted: (state) => {
-      state.todos = state.todos.filter((t) => !t.completed);
+      state.todos = state.todos.filter((todo) => !todo.completed);
+    },
+    setFilterStatus: (state, action) => {
+      state.filterStatus = action.payload;
+    },
+    toggleFilterColor: (state, action) => {
+      const color = action.payload;
+      if (state.filterColors.includes(color)) {
+        state.filterColors = state.filterColors.filter((c) => c !== color);
+      } else {
+        state.filterColors.push(color);
+      }
     },
   },
 });
 
 export const {
   addTodo,
-  toggleTodo,
-  removeTodo,
+  toggleComplete,
   changeColor,
+  deleteTodo,
   markAllCompleted,
   clearCompleted,
+  setFilterStatus,
+  toggleFilterColor,
 } = todosSlice.actions;
 
 export default todosSlice.reducer;
