@@ -56,6 +56,8 @@ function App() {
     return true;
   });
 
+  const remainingTodos = todos.filter((todo) => !todo.completed).length;
+
   return (
     <div className="max-w-3xl mx-auto mt-10 p-5 bg-gray-50 shadow-md rounded-lg">
       <h1 className="text-3xl font-bold text-center text-red-500 mb-5">Todos</h1>
@@ -92,6 +94,12 @@ function App() {
         filterColors={filterColors}
         setFilterColors={setFilterColors}
       />
+      <div className="text-lg font-semibold mt-5">
+        {remainingTodos > 0
+          ? `Remaining Todos: ${remainingTodos}`
+          : "All todos are completed!"}
+      </div>
+
     </div>
   );
 }
